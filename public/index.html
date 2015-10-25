@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang='en-us'>
+<head>
+	<meta charset='utf-8' />
+	<title>Orders App using MEAN Stack</title>
+	<link rel='stylesheet' href='http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css' />
+</head>
+<body ng-app='OrdersApp'>
+
+<nav class='navbar navbar-default'>
+	<div class='container'>
+		<ul class='nav navbar-nav'>
+			<li><a href='/#/register'>Register</a></li>
+			<li><a href='/#/login'>Login</a></li>
+		</ul>
+	</div>
+</nav>
+
+<div class='container' ng-view></div>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.0-beta.1/angular.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.0-beta.1/angular-route.js'></script>
+<script>
+angular.module('OrdersApp', ['ngRoute']);
+
+angular.module('OrdersApp').config(function($routeProvider) {
+
+	$routeProvider
+	.when('/login', {
+		controller: 'LoginCtrl',
+		templateUrl: 'templates/login.html'
+	})
+	.when('/register', {
+		controller: 'RegisterCtrl',
+		templateUrl: 'templates/register.html'
+	})
+	.when('/shop', {
+		controller: 'ShopCtrl',
+		templateUrl: 'templates/shop.html'
+	})
+	.otherwise({ redirectTo: '/login' });
+
+});
+
+angular.module('OrdersApp').controller('ShopCtrl', ['$scope', '$http', function($scope,$http) {
+
+	$http.get('/api/shop').then(function(oResponse) {
+		if(oResponse.data.bSuccess) {
+			$scope.items = oResponse.data.aItems.map(function(item) { 
+				return Object.defineProperty(item,'quantity', { 
+					value: 0, configurable: true, enumerable: true, writable: true 
+				}); 
+			});
+		}
+	});
+
+	$scope.plusOne = function(index) {
+		$scope.items[index].quantity++;
+	}
+
+	$scope.zeroQuantity = function(index) {
+		$scope.items[index].quantity = 0;
+	}
+
+
+	$scope.placeOrder = function() {
+		var orderItems = $scope.items.filter(function(item) {
+			return item.quantity > 0
+		});
+
+		if(orderItems.length > 0) {
+			$http.post('/api/shop', orderItems).then(function(oResponse) {
+				console.log('placeOrder response:', oResponse);
+			});
+		}
+		
+	}
+
+}]);
+
+angular.module('OrdersApp').controller('LoginCtrl', ['$scope','$http', function($scope,$http) {
+
+	$scope.login = function() {
+
+		$http.post('/api/user/login', { 
+			username: $scope.username, 
+			password: $scope.password 
+		}).then(function(oResponse) {
+			console.log('login response:', oResponse);
+		});
+	}
+
+}]);
+
+angular.module('OrdersApp').controller('RegisterCtrl', ['$scope','$http','$location', function($scope,$http,$location) {
+	
+	$scope.register = function() {
+
+		$http.post('/api/user/register', $scope.user).then(function(oResponse) {
+			
+			if(oResponse.data.bSuccess) $location.path('/shop');
+
+		});
+	}	
+
+}]);
+
+
+
+
+</script>
+</body>
+</html>
