@@ -46,6 +46,7 @@ angular.module('OrdersApp').config(function($routeProvider) {
 angular.module('OrdersApp').controller('ApplicationCtrl', ['$http','$location','$scope', function($http,$location, $scope) {
 
 	$scope.$on('login', function(_, oResponse) {
+		
 		$scope.admin = oResponse.data.bAdmin; 
 		$scope.currentUser = oResponse.data.sUsername;
 	});
@@ -62,7 +63,7 @@ angular.module('OrdersApp').controller('ApplicationCtrl', ['$http','$location','
 }]);
 
 angular.module('OrdersApp').controller('ShopCtrl', ['$scope', '$http','$location', function($scope,$http,$location) {
-
+	
 	$http.get('/api/shop').then(function(oResponse) {
 
 		$scope.$emit('login', oResponse);
@@ -129,7 +130,10 @@ angular.module('OrdersApp').controller('RegisterCtrl', ['$scope','$http','$locat
 
 		$http.post('/api/user/register', $scope.user).then(function(oResponse) {
 			
-			if(oResponse.data.bSuccess) $location.path('/shop');
+			if(oResponse.data.bSuccess) {
+				$scope.$emit('login', oResponse);
+				$location.path('/shop');
+			}
 
 		});
 	}	

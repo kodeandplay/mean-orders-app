@@ -1,18 +1,36 @@
 var router = require('express').Router(),
+	config = require('../config'),
+	crypto = require('crypto'),
 	User = require('../models/user');
+
+var hashPassword = function(rawPassword) {
+	var hasher = crypto.createHash(config.hashAlgorithm);
+	return hasher.update(rawPassword).digest('hex');	
+}
 
 router.post('/register', function(req, res) {
 	
 	var oUser = new User(req.body);
+
+	oUser.password = hashPassword(oUser.password);
+	
 	oUser.save(function(err, user) {
-		res.status(200).send({ bSuccess: true, bMessage: "Registration successful", user: user });
+		req.session.userID = user._id;
+		res.status(200).send({ 
+			bSuccess: true, 
+			bMessage: "Registration successful", 
+			bAdmin: user.admin, 
+			sUsername: user.username 
+		});
 	});
 
 });
 
 router.post('/login', function(req, res) {
 
-	User.find({ username: req.body.username, password: req.body.password }, function(err, users) {
+	var hashedPassword = hashPassword(req.body.password);
+
+	User.find({ username: req.body.username, password: hashedPassword }, function(err, users) {
 
 		// error checking here
 		if(err || !users.length) {

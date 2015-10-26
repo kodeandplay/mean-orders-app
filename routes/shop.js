@@ -38,8 +38,7 @@ router.post('/', function(req, res) {
 				{ $push: { "orders": { items: req.body } } },
 				{ 'new': true, upsert: false }
 			, function(err, oUser) {
-
-				console.log('user:', oUser);	
+	
 				res.send({ bSuccess: true, bMessage: 'Order successful!' });	
 
 			});

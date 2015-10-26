@@ -1,7 +1,7 @@
 {
   "name": "mean-orders-app",
   "version": "0.0.1",
-  "main": "server.js",
+  "main": "main.js",
   "description": "simple orders app using mean stack",
   "author": "Jack",
   "dependencies": {
