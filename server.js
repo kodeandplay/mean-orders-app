@@ -1,38 +1,35 @@
 var express = require('express'),
-	redis = require('redis'),
+	config = require('./config'),
+	auth = require('./auth'),
+	redisClient = require('./redis_client'),
 	routes = require('./routes'),
 	session = require('express-session'),
 	RedisStore = require('connect-redis')(session),
 	bodyParser = require('body-parser'),
 	app = express();
 
-var client = redis.createClient();
-
-client.on('connect', function() {
-	console.log('Redis connection established');
-});
-
-client.on('error', function(err) {
-	console.log('Error:', err);
-});
 
 app.use(express.static(__dirname + '/public'));
 app.use(session({
 	store: new RedisStore({
 		host: 'localhost',
 		port: 3679,
-		client: client
+		client: redisClient
 	}),
-	secret: 'supersecretkey',
+	secret: config.sessionSecret,
 	saveUninitialized: true,
 	resave: true
 }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// custom middleware
+app.use(auth);
+
 app.use('/api/user', routes.user);
 app.use('/api/shop', routes.shop);
 
-app.listen(3000, function() {
-	console.log('Server listening on port %d', 3000);
+app.listen(config.port, function() {
+	console.log('Server listening on port %d', config.port);
 });
+

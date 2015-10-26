@@ -5,13 +5,15 @@
 	<title>Orders App using MEAN Stack</title>
 	<link rel='stylesheet' href='http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css' />
 </head>
-<body ng-app='OrdersApp'>
+<body ng-app='OrdersApp' ng-controller='ApplicationCtrl'>
 
 <nav class='navbar navbar-default'>
 	<div class='container'>
 		<ul class='nav navbar-nav'>
 			<li><a href='/#/register'>Register</a></li>
-			<li><a href='/#/login'>Login</a></li>
+			<li ng-if='!currentUser'><a href='/#/login'>Login</a></li>
+			<li ng-if='currentUser' ng-click='logout()'><a href=''>Logout</a></li>
+			<li ng-if='admin'><a href='/#/admin'>Admin</a></li>
 		</ul>
 	</div>
 </nav>
@@ -41,16 +43,41 @@ angular.module('OrdersApp').config(function($routeProvider) {
 
 });
 
-angular.module('OrdersApp').controller('ShopCtrl', ['$scope', '$http', function($scope,$http) {
+angular.module('OrdersApp').controller('ApplicationCtrl', ['$http','$location','$scope', function($http,$location, $scope) {
+
+	$scope.$on('login', function(_, oResponse) {
+		$scope.admin = oResponse.data.bAdmin; 
+		$scope.currentUser = oResponse.data.sUsername;
+	});
+
+
+
+	$scope.logout = function() {
+		$http.delete('/api/user').then(function(oResponse) {
+			$scope.currentUser = null;
+			$location.path('/login');						
+		});
+	};
+
+}]);
+
+angular.module('OrdersApp').controller('ShopCtrl', ['$scope', '$http','$location', function($scope,$http,$location) {
 
 	$http.get('/api/shop').then(function(oResponse) {
+
+		$scope.$emit('login', oResponse);
+
 		if(oResponse.data.bSuccess) {
 			$scope.items = oResponse.data.aItems.map(function(item) { 
 				return Object.defineProperty(item,'quantity', { 
 					value: 0, configurable: true, enumerable: true, writable: true 
 				}); 
 			});
+		} else {
+			$location.path('/');
 		}
+	}, function(oError) {
+		$location.path('/');
 	});
 
 	$scope.plusOne = function(index) {
@@ -77,15 +104,20 @@ angular.module('OrdersApp').controller('ShopCtrl', ['$scope', '$http', function(
 
 }]);
 
-angular.module('OrdersApp').controller('LoginCtrl', ['$scope','$http', function($scope,$http) {
+angular.module('OrdersApp').controller('LoginCtrl', ['$scope','$http','$location', function($scope,$http,$location) {
 
-	$scope.login = function() {
+	$scope.login = function(username, password) {
+
+		if(!username || !password) return;
 
 		$http.post('/api/user/login', { 
-			username: $scope.username, 
-			password: $scope.password 
+			username: username,
+			password: password 
 		}).then(function(oResponse) {
-			console.log('login response:', oResponse);
+			if(oResponse.data.bSuccess) {
+				$scope.$emit('login', oResponse);
+				$location.path('/shop');
+			}
 		});
 	}
 

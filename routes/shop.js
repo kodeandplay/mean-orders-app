@@ -3,15 +3,25 @@ var router = require('express').Router(),
 	User = require('../models/user');
 
 router.get('/', function(req, res) {
-	console.log('session:', req.session);
-	Item.find({}).exec(function(err, oData) {
+	console.log('session:', req.oUser);
 
-		res.send({ 
-			bSuccess: true, 
-			aItems: oData
+	if(req.oUser) {
+		Item.find({}).exec(function(err, oData) {
+
+			res.send({ 
+				bAdmin: req.oUser.admin,
+				sUsername: req.oUser.username,
+				bSuccess: true, 
+				aItems: oData
+			});
+
 		});
-
-	});
+	} else {		
+		res.status(401).send({ 
+			bSuccess: false, 
+			sMessage: 'Unathorized Access'
+		});		
+	}
 });
 
 router.post('/', function(req, res) {

@@ -4,7 +4,7 @@
   		<span class='glyphicon glyphicon-remove-circle' ng-click='zeroQuantity($index)' style='cursor:pointer;margin-left:5px;float:right'></span>
   		<span class="badge" ng-click='plusOne($index)' style="float:right;cursor:pointer">{{ item.quantity }}</span>
   	</h4>
-  	<p class="list-group-item-text">{{ item.price }}</p>
+  	<p class="list-group-item-text">{{ item.price | currency }}</p>
   </li>
 </ul>
 <input type='button' ng-click='placeOrder()' value='Place Order' class='btn btn-success btn-lg btn-block' />

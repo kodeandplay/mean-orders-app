@@ -11,19 +11,35 @@ router.post('/register', function(req, res) {
 });
 
 router.post('/login', function(req, res) {
-	console.log('login:', req.session);
 
 	User.find({ username: req.body.username, password: req.body.password }, function(err, users) {
 
 		// error checking here
+		if(err || !users.length) {
+			console.log('Error logging in:', err, users);
+			return res.send({bSuccess: false, bMessage: 'Login unsuccessful'});
+		}
 
 		var user = users[0];
 		req.session.userID = user._id;
-		console.log('session:', req.session);		
-		res.send({ bSuccess: true, bMessage: 'Login successful' });
+		res.send({ bSuccess: true, bMessage: 'Login successful', bAdmin: user.admin, sUsername: user.username });
 
 	});
 	
+});
+
+router.delete('/', function(req, res) {
+
+	req.session.destroy(function(err) {
+		
+		if(err){
+			console.log('Error logging out:', err);
+			res.send({ bSuccess: false, bMessage: 'Logout unsuccessful' });
+		} else {
+			res.send({ bSuccess: true, bMessage: 'Logout successful' });
+		}
+	});
+
 });
 
 
