@@ -28,6 +28,7 @@ app.use(auth);
 
 app.use('/api/user', routes.user);
 app.use('/api/shop', routes.shop);
+app.use('/api/admin', routes.admin);
 
 app.listen(config.port, function() {
 	console.log('Server listening on port %d', config.port);

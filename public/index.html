@@ -24,6 +24,14 @@
 <script>
 angular.module('OrdersApp', ['ngRoute']);
 
+angular.module('OrdersApp').service('ShopService',['$http', function($http) {
+
+	this.getItems = function() {
+		return $http.get('/api/shop');
+	}
+
+}]);
+
 angular.module('OrdersApp').config(function($routeProvider) {
 
 	$routeProvider
@@ -39,18 +47,20 @@ angular.module('OrdersApp').config(function($routeProvider) {
 		controller: 'ShopCtrl',
 		templateUrl: 'templates/shop.html'
 	})
+	.when('/admin', {
+		controller: 'AdminCtrl',
+		templateUrl: 'templates/admin.html'
+	})
 	.otherwise({ redirectTo: '/login' });
 
 });
 
 angular.module('OrdersApp').controller('ApplicationCtrl', ['$http','$location','$scope', function($http,$location, $scope) {
 
-	$scope.$on('login', function(_, oResponse) {
-		
+	$scope.$on('login', function(_, oResponse) {		
 		$scope.admin = oResponse.data.bAdmin; 
 		$scope.currentUser = oResponse.data.sUsername;
 	});
-
 
 
 	$scope.logout = function() {
@@ -62,9 +72,34 @@ angular.module('OrdersApp').controller('ApplicationCtrl', ['$http','$location','
 
 }]);
 
-angular.module('OrdersApp').controller('ShopCtrl', ['$scope', '$http','$location', function($scope,$http,$location) {
+angular.module('OrdersApp').controller('AdminCtrl', ['ShopService','$scope','$http','$location', 
+  function(ShopService,$scope,$http,$location) {
+
+  	$scope.items = [];
+
+	ShopService.getItems().then(function(oResponse) {
+		$scope.items = oResponse.data.aItems.map(function(item) {
+			item.tags = item.tags.join(',');
+			return item;
+		});
+
+	});
+
+	$scope.addItem = function() {
+		$http.post('/api/admin/item', $scope.item).then(function(oResponse) {
+			var item = oResponse.data.item;
+			item.tags = item.tags.join(',');
+			$scope.items.unshift(item);
+		});
+	};
+
+}]);
+
+
+angular.module('OrdersApp').controller('ShopCtrl', ['ShopService','$scope', '$http','$location', 
+  function(ShopService,$scope,$http,$location) {
 	
-	$http.get('/api/shop').then(function(oResponse) {
+	ShopService.getItems().then(function(oResponse) {
 
 		$scope.$emit('login', oResponse);
 
@@ -97,7 +132,9 @@ angular.module('OrdersApp').controller('ShopCtrl', ['$scope', '$http','$location
 
 		if(orderItems.length > 0) {
 			$http.post('/api/shop', orderItems).then(function(oResponse) {
-				console.log('placeOrder response:', oResponse);
+				// console.log('placeOrder response:', oResponse);
+				// lame, i know
+				window.alert("Order placed");
 			});
 		}
 		
