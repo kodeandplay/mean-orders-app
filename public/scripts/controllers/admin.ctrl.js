@@ -13,8 +13,8 @@ angular.module('OrdersApp').controller('AdminCtrl', ['ShopService','$scope','$ht
 
 	$scope.addItem = function() {
 		$http.post('/api/admin/item', $scope.item).then(function(oResponse) {
+			console.log('addItem:', oResponse);
 			var item = oResponse.data.item;
-			item.tags = item.tags.join(',');
 			$scope.items.unshift(item);
 		});
 	};

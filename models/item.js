@@ -6,4 +6,12 @@ var ItemSchema = db.Schema({
   	tags: [String]
 });
 
+ItemSchema.path('tags').set(function(value) {
+	return value.split(',').map(function(tag) { return tag.trim().toLowerCase() });
+});
+
+ItemSchema.path('tags').get(function(value) {
+	return value.join(',');
+});
+
 module.exports = db.model('Item', ItemSchema, 'item');

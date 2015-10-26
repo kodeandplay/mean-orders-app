@@ -3,9 +3,7 @@ var router = require('express').Router(),
 
 router.post('/item', function(req, res) {
 
-	var oItem = req.body;
-	oItem.tags = oItem.tags.split(',').map(function(tag) { return tag.trim().toLowerCase() });
-	var item = new Item(oItem);
+	var item = new Item(req.body);
 
 	item.save(function(err, newItem) {
 		if(err) {
