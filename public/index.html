@@ -4,6 +4,13 @@
 	<meta charset='utf-8' />
 	<title>Orders App using MEAN Stack</title>
 	<link rel='stylesheet' href='http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css' />
+	<style>
+	.sticky {
+		position: fixed;
+		top: 0;
+		z-index: 1000;
+	}
+	</style>
 </head>
 <body ng-app='OrdersApp' ng-controller='ApplicationCtrl'>
 
@@ -21,6 +28,7 @@
 <div class='container' ng-view></div>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.0-beta.1/angular.js'></script>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.0-beta.1/angular-route.js'></script>
+<script src='scripts/debounce.js'></script>
 <script src='scripts/app.js'></script>
 <script src='scripts/controllers/register.ctrl.js'></script>
 <script src='scripts/controllers/login.ctrl.js'></script>

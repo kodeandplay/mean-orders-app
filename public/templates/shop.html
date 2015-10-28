@@ -1,3 +1,4 @@
+<input type='button' ng-click='placeOrder()' value='Place Order' id='placeOrderButton' class='btn btn-success btn-lg btn-block' />
 <ul class="list-group" ng-repeat='item in items'>
   <li class="list-group-item">
   	<h4 class="list-group-item-heading">{{ item.name }}
@@ -7,4 +8,3 @@
   	<p class="list-group-item-text">{{ item.price | currency }}</p>
   </li>
 </ul>
-<input type='button' ng-click='placeOrder()' value='Place Order' class='btn btn-success btn-lg btn-block' />

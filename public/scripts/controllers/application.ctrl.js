@@ -8,6 +8,7 @@ angular.module('OrdersApp').controller('ApplicationCtrl', ['$http','$location','
 
 	$scope.logout = function() {
 		$http.delete('/api/user').then(function(oResponse) {
+			$scope.admin = null;
 			$scope.currentUser = null;
 			$location.path('/login');						
 		});

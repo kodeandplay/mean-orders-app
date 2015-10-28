@@ -3,7 +3,7 @@ var router = require('express').Router(),
 	User = require('../models/user');
 
 router.get('/', function(req, res) {
-	console.log('session:', req.oUser);
+	// console.log('session:', req.oUser);
 
 	if(req.oUser) {
 		Item.find({}).exec(function(err, oData) {

@@ -14,4 +14,8 @@ ItemSchema.path('tags').get(function(value) {
 	return value.join(',');
 });
 
+ItemSchema.path('price').set(function(value) {
+	return +value; // Cast to Number if so needed
+});
+
 module.exports = db.model('Item', ItemSchema, 'item');
