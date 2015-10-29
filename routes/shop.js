@@ -24,6 +24,21 @@ router.get('/', function(req, res) {
 	}
 });
 
+router.get('/search', function(req, res) {
+
+	Item.aggregate([
+		{ $unwind: "$tags" },
+		{ $match: { "tags": "home"} }
+		// { $group: { _id: null, count: { $sum: 1 } } }
+	], function(err, items) {
+
+		console.log('items:', items);
+
+		res.send({ bSuccess: true, items: items });
+	});
+
+});
+
 router.post('/', function(req, res) {
 
 	if(req.session.userID) {
