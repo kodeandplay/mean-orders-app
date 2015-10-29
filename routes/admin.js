@@ -1,5 +1,6 @@
 var router = require('express').Router(),
-	Item = require('../models/item');
+	Item = require('../models/item'),
+	redisClient = require('../redis_client');
 
 router.post('/item', function(req, res) {
 
@@ -7,10 +8,28 @@ router.post('/item', function(req, res) {
 
 	item.save(function(err, newItem) {
 		if(err) {
+
 			console.log('Error newItem:', err);
 			res.send({ bSuccess: false, bMessage: 'Item added unsuccessfully' });
+
 		} else {
-			res.send({ bSuccess: true, bMessage: 'Item added successfully', item: newItem });
+
+			var key = 'aItems';
+			redisClient.hgetall(key, function(err, aItems) {
+				console.log('adding to redis');
+				var aItems = JSON.parse(aItems.sJSON);
+				aItems.push(newItem);
+				var sJSON = JSON.stringify(aItems);
+
+				redisClient.hmset(key, { sJSON: sJSON }, function(err, oResult) {
+
+					if(err) return console.log('Error adding items to redis:', err);
+
+					res.send({ bSuccess: true, bMessage: 'Item added successfully', item: newItem });
+
+				});
+				
+			});
 		}
 	});
 
@@ -26,7 +45,6 @@ router.put('/item', function(req, res) {
 		}
 
 		var item = items[0];
-
 		item.name = req.body.name;
 		item.price = req.body.price;
 		item.tags = req.body.tags;
@@ -38,9 +56,25 @@ router.put('/item', function(req, res) {
 				return res.send({ bSuccess: false, bMessage: 'Item not updated' });
 			}
 
+			var key = 'aItems';
+			redisClient.hgetall(key, function(err, aItems) {
+				console.log('updating redis');
+				var aItems = JSON.parse(aItems.sJSON);
+				var idx = aItems.findIndex(function(elem) {
+					return elem._id === updatedItem._id
+				});
+				aItems[idx] = updatedItem;
+				var sJSON = JSON.stringify(aItems);
 
-			console.log('updatedItem:', updatedItem);
-			res.send({ bSuccess: true, bMessage: 'Item updated successfully', updatedItem: updatedItem });
+				redisClient.hmset(key, { sJSON: sJSON }, function(err, oResult) {
+
+					if(err) return console.log('Error adding items to redis:', err);
+
+					res.send({ bSuccess: true, bMessage: 'Item updated successfully', updatedItem: updatedItem });
+
+				});
+				
+			});
 
 		});
 

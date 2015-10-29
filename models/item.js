@@ -7,7 +7,11 @@ var ItemSchema = db.Schema({
 });
 
 ItemSchema.path('tags').set(function(value) {
+	
+	if(Array.isArray(value)) return value;
+
 	return value.split(',').map(function(tag) { return tag.trim().toLowerCase() });
+	
 });
 
 ItemSchema.path('tags').get(function(value) {
