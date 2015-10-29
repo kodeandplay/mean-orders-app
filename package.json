@@ -1,6 +1,6 @@
 {
   "name": "mean-orders-app",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "main.js",
   "description": "simple orders app using mean stack",
   "author": "Jack",
@@ -11,5 +11,10 @@
     "express-session": "1.11.3",
     "mongoose": "4.2.2",
     "redis": "2.2.5"
+  },
+  "devDependencies": {
+    "chai": "3.4.0",
+    "mocha": "2.3.3",
+    "request": "2.65.0"
   }
 }
