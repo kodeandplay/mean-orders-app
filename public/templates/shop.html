@@ -7,7 +7,7 @@
 	</div>
 </form>
 <input type='button' ng-click='placeOrder()' value='Place Order' id='placeOrderButton' style='margin-bottom:5px' class='btn btn-success btn-lg btn-block' />
-<ul class="list-group" ng-repeat='item in items | filter:searchText'>
+<ul class="list-group" ng-repeat='item in items | filter:{name: searchText}'>
   <li class="list-group-item">
   	<h4 class="list-group-item-heading">{{ item.name }}
   		<span class='glyphicon glyphicon-remove-circle pull-right' ng-click='zeroQuantity($index)' style='cursor:pointer;margin-left:5px;'></span>
